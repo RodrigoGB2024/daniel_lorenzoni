@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daniel Lorenzoni | Karatê</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap');
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #050505; 
+            background: radial-gradient(circle at top right, #1a0505, #050505 60%);
+            color: #ffffff; 
+            overflow-x: hidden; 
+            scroll-behavior: smooth; 
+        }
+
+        /* Foto de Fundo (Overlay) */
+        .bg-action-overlay {
+            position: fixed;
+            top: 0;
+            right: -5%;
+            width: 70%;
+            height: 100vh;
+            background: url('GALERIA/daniel_fundo.png') no-repeat center right;
+            background-size: contain;
+            opacity: 0.07;
+            filter: grayscale(100%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* TIPOGRAFIA HERO - BRANCO SÓLIDO */
+        .hero-title { line-height: 0.75; letter-spacing: -0.05em; }
+        .text-white-impact {
+            font-family: 'Inter', sans-serif;
+            font-weight: 900;
+            font-style: italic;
+            text-transform: uppercase;
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        }
+
+        /* DESIGN DO CARD DE APOIO DIRETO */
+        .rifa-card {
+            background-color: #110e0e;
+            border-radius: 40px;
+            padding: 3rem;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .badge-status {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: #ef4444;
+            color: white;
+            padding: 10px 40px;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: 12px;
+            border-bottom-left-radius: 20px;
+            border-top-right-radius: 40px;
+            letter-spacing: 1px;
+        }
+
+        .rifa-title {
+            font-size: 38px;
+            font-weight: 900;
+            font-style: italic;
+            text-transform: uppercase;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+
+        .rifa-subtitle {
+            color: #ef4444;
+            text-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-pix {
+            background-color: #ffffff;
+            color: #000000;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding: 20px 60px;
+            border-radius: 50px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .btn-pix:hover {
+            background-color: #ef4444;
+            color: #ffffff;
+            transform: scale(1.05);
+        }
+
+        /* CONTAINER DOS PATROCINADORES FIXOS E COLORIDOS */
+        .sponsor-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            padding: 40px 0;
+            max-w: 5xl;
+            margin: 0 auto;
+        }
+        
+        .sponsor-item-fixed { 
+            width: 180px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+        }
+        
+        .sponsor-item-fixed img { 
+            max-width: 100%; 
+            height: auto; 
+            max-height: 120px; 
+            filter: grayscale(0%);
+            opacity: 0.95; 
+            transition: all 0.4s ease; 
+        }
+        
+        .sponsor-item-fixed img:hover { 
+            opacity: 1; 
+            transform: scale(1.08); 
+            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.15));
+        }
+
+        /* MODAL E ABAS */
+        #album-modal { display: none; position: fixed; inset: 0; z-index: 80; background: #0a0a0a; padding: 2rem; overflow-y: auto; }
+        #album-modal.active { display: block; animation: fadeIn 0.3s ease; }
+
+        .tab-content { opacity: 0; transform: translateY(15px); transition: all 0.5s ease; display: none; }
+        .tab-content.active-tab { display: grid; opacity: 1; transform: translateY(0); }
+        #main-grid-campeonato.active-tab { display: flex; }
+
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        .tab-active { color: #ef4444; border-bottom: 2px solid #ef4444; }
+
+        .media-card { position: relative; border-radius: 12px; overflow: hidden; background: #171717; border: 1px solid rgba(255,255,255,0.05); aspect-ratio: 1 / 1; cursor: pointer; transition: all 0.5s; }
+        .media-card:hover { border-color: #ef4444; transform: scale(1.02); }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: #ef4444; border-radius: 10px; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="bg-action-overlay"></div>
+
+    <div id="banner-timer" class="bg-red-600 text-white text-[10px] font-black uppercase tracking-[0.3em] py-2.5 text-center sticky top-0 z-50 shadow-xl">
+        Classificatória Brasileiro: <span id="countdown-days" class="text-xl ml-2">--</span> Dias
+    </div>
+
+    <header class="p-6 border-b border-white/5 flex justify-between items-center bg-black/80 backdrop-blur-xl z-40">
+        <div class="flex items-center gap-2 group cursor-pointer">
+            <div class="w-1.5 h-6 bg-red-600"></div>
+            <h1 class="text-xl italic tracking-tighter uppercase font-black">AKA <span class="text-red-600">Vni</span></h1>
+        </div>
+        <a href="#sessao-apoio" class="bg-red-600 hover:bg-red-700 text-white font-bold text-[10px] uppercase tracking-widest px-6 py-2.5 rounded-full transition-all">Apoiar Atleta</a>
+    </header>
+
+    <div id="album-modal">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-between items-center mb-10">
+                <div>
+                    <h3 id="modal-title" class="text-3xl md:text-5xl font-black italic uppercase"></h3>
+                    <div class="h-1 w-20 bg-red-600 mt-2"></div>
+                </div>
+                <button onclick="closeAlbumModal()" class="text-white hover:text-red-500 text-4xl">&times;</button>
+            </div>
+            
+            <div class="flex gap-8 mb-12 border-b border-white/10">
+                <button onclick="switchSubTab('fotos')" id="sub-btn-fotos" class="pb-4 font-bold uppercase tracking-widest text-red-500 border-b-2 border-red-500">Fotos</button>
+                <button onclick="switchSubTab('videos')" id="sub-btn-videos" class="pb-4 font-bold uppercase tracking-widest text-gray-500">Vídeos</button>
+            </div>
+
+            <div id="sub-grid-fotos" class="grid grid-cols-2 md:grid-cols-4 gap-6"></div>
+            <div id="sub-grid-videos" class="hidden grid grid-cols-1 md:grid-cols-3 gap-8"></div>
+        </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-6 py-16 relative">
+        
+        <section class="mb-24 reveal pt-10 hero-title">
+            <span class="text-red-600 font-black uppercase tracking-[0.5em] text-[10px] border-l-2 border-red-600 pl-4 mb-8 block">Karatê Shotokan </span>
+            <h2 class="text-5xl md:text-[10rem] font-black select-none">
+                <span class="text-white-impact block">DANIEL</span> 
+                <span class="text-white-impact block -mt-2 md:-mt-5">LORENZONI</span>
+            </h2>
+        </section>
+
+        <section id="sessao-apoio" class="mb-32 reveal flex justify-center">
+            <div class="rifa-card max-w-4xl w-full text-center">
+                <div class="badge-status">Apoio Aberto</div>
+                <h3 class="rifa-title">APOIE ESTA JORNADA <br><span class="rifa-subtitle">RUMO AO BRASILEIRO 2026</span></h3>
+                <p class="text-gray-400 max-w-2xl mx-auto mb-8 text-sm tracking-wide leading-relaxed">
+                    Qualquer contribuição faz a diferença.
+                </p>
+                <button onclick="copyPix()" class="btn-pix mx-auto block">COPIAR CHAVE PIX - 20147969719</button>
+                <p id="pix-msg" class="text-[10px] text-green-500 mt-4 uppercase tracking-widest font-black hidden">✓ Chave copiada! Use o seu banco para pagar.</p>
+            </div>
+        </section>
+
+        <section id="galeria" class="mb-12 border-b border-white/10 flex gap-10 reveal">
+            <button onclick="switchMainTab('treino')" id="btn-treino" class="pb-6 font-black uppercase tab-active text-xs tracking-[0.2em]">Galeria</button>
+            <button onclick="switchMainTab('campeonato')" id="btn-campeonato" class="pb-6 font-black uppercase text-gray-500 text-xs tracking-[0.2em]">Competições 2026</button>
+        </section>
+
+        <!-- GRADE DA GALERIA PRINCIPAL OTIMIZADA PARA MOBILE -->
+        <div id="main-grid-treino" class="tab-content active-tab grid-cols-1 md:grid-cols-3 gap-10">
+            
+            <!-- VÍDEO 1 -->
+            <div class="media-card" onclick="viewMedia(this, 'video')">
+                <video poster="GALERIA/capa_vni.png" playsinline preload="metadata" class="w-full h-full object-cover">
+                    <source src="GALERIA/campeonato_vni.mp4" type="video/mp4">
+                </video>
+                <div class="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 hover:opacity-100 transition-opacity"><i class="fas fa-play text-white text-4xl"></i></div>
+            </div>
+            
+            <!-- VÍDEO 2 (MEDALHAS - COM CORREÇÃO DE PLAYBACK) -->
+            <div class="media-card" onclick="viewMedia(this, 'video')">
+                <video poster="GALERIA/capa_medalhas.png" playsinline preload="metadata" muted class="w-full h-full object-cover">
+                    <source src="GALERIA/medalhas.mp4" type="video/mp4">
+                </video>
+                <div class="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 hover:opacity-100 transition-opacity"><i class="fas fa-play text-white text-4xl"></i></div>
+            </div>
+            
+            <!-- VÍDEO 3 -->
+            <div class="media-card" onclick="viewMedia(this, 'video')">
+                <video poster="GALERIA/capa_daniel.jpg" playsinline preload="metadata" class="w-full h-full object-cover">
+                    <source src="GALERIA/daniel.mp4" type="video/mp4">
+                </video>
+                <div class="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 hover:opacity-100 transition-opacity"><i class="fas fa-play text-white text-4xl"></i></div>
+            </div>
+
+            <!-- FOTO 1 (Substitua 'foto1.jpeg' pelo nome real do arquivo dentro da pasta GALERIA) -->
+            <div class="media-card" onclick="viewMedia(this, 'img')">
+                <img src="GALERIA/daniel1.jpeg" class="w-full h-full object-cover" alt="Daniel Karatê">
+            </div>
+
+            <!-- FOTO 2 (Substitua 'foto2.jpeg' pelo nome real do arquivo dentro da pasta GALERIA) -->
+            <div class="media-card" onclick="viewMedia(this, 'img')">
+                <img src="GALERIA/daniel2.jpeg" class="w-full h-full object-cover" alt="Daniel Karatê">
+            </div>
+
+            <!-- FOTO 3 (Substitua 'foto3.jpeg' pelo nome real do arquivo dentro da pasta GALERIA) -->
+            <div class="media-card" onclick="viewMedia(this, 'img')">
+                <img src="GALERIA/daniel3.jpeg" class="w-full h-full object-cover" alt="Daniel Karatê">
+            </div>
+
+            <!-- FOTO 4 (Substitua 'foto4.jpeg' pelo nome real do arquivo dentro da pasta GALERIA) -->
+            <div class="media-card" onclick="viewMedia(this, 'img')">
+                <img src="GALERIA/daniel4.jpeg" class="w-full h-full object-cover" alt="Daniel Karatê">
+            </div>
+             <!-- FOTO 5 (Substitua 'foto5.jpeg' pelo nome real do arquivo dentro da pasta GALERIA) -->
+            <div class="media-card" onclick="viewMedia(this, 'img')">
+                <img src="GALERIA/daniel5.jpeg" class="w-full h-full object-cover" alt="Daniel Karatê">
+            </div>
+
+        </div>
+
+        <div id="main-grid-campeonato" class="tab-content flex-col gap-6">
+            <div class="group border border-white/5 p-10 rounded-3xl bg-white/[0.02] hover:bg-white/[0.05] transition-all cursor-pointer flex justify-between items-center" onclick="openAlbum('vitoria')">
+                <div class="flex items-center gap-6">
+                    <div class="w-16 h-16 bg-red-600/10 rounded-2xl flex items-center justify-center border border-red-600/20">
+                        <i class="fas fa-trophy text-red-600 text-2xl"></i>
+                    </div>
+                    <div>
+                        <span class="bg-yellow-600 text-black px-2 py-0.5 rounded text-[8px] font-black italic uppercase mb-2 inline-block">Ouro Kata</span>
+                        <h3 class="text-2xl md:text-4xl font-black italic uppercase">Campeonato Capixaba 2026</h3>
+                    </div>
+                </div>
+                <i class="fas fa-arrow-right text-red-600 text-2xl group-hover:translate-x-3 transition-transform"></i>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-[#030303] border-t border-white/5 py-24 px-6 reveal">
+        <div class="max-w-7xl mx-auto flex flex-col items-center text-center">
+            <div class="w-full">
+                <p class="text-[10px] font-black uppercase tracking-[0.5em] text-gray-700 mb-6">NOSSOS PATROCINADORES</p>
+                <div class="sponsor-grid">
+                    <div class="sponsor-item-fixed"><img src="PATROCINADORES/rbinformatica.jpeg" alt="RB Informática"></div>
+                    <div class="sponsor-item-fixed"><img src="PATROCINADORES/willian.jpeg" alt="Patrocinador"></div>
+                    <div class="sponsor-item-fixed"><img src="PATROCINADORES/barbearia.jpeg" alt="Barbearia"></div>
+                    <div class="sponsor-item-fixed"><img src="PATROCINADORES/elaine.jpeg" alt="Patrocinador"></div>
+                    <div class="sponsor-item-fixed"><img src="PATROCINADORES/rafael.png" alt="Patrocinador"></div>
+                </div>
+            </div>
+            <p class="mt-24 text-gray-800 text-[10px] font-black tracking-[0.4em] uppercase">© AKA VNI | Daniel Lorenzoni | Venda Nova do Imigrante | Oss!</p>
+        </div>
+    </footer>
+
+    <div id="lightbox" class="fixed inset-0 z-[100] bg-black/95 hidden items-center justify-center p-4 md:p-10">
+        <button onclick="closeLightbox(event)" class="absolute top-5 right-5 text-white/70 hover:text-red-500 text-5xl font-light transition-colors z-[110]">&times;</button>
+        
+        <div id="lightbox-container" class="w-full h-full flex items-center justify-center" onclick="closeLightbox(event)"></div>
+    </div>
+
+    <script>
+        const albums = {
+            'vitoria': {
+                title: 'Campeonato Capixaba 2026',
+                folder: '1ª_ETAPA',
+                fotos: ['img1.jpeg', 'img2.jpeg', 'img3.jpeg', 'img4.jpeg', 'img5.jpeg', 'img6.jpeg', 'img7.jpeg', 'img8.jpeg', 'img9.jpeg', 'img10.jpeg', 'img11.jpeg', 'img12.jpeg'],
+                videos: [{ arquivo: 'podio.mp4', capa: 'capa_podio.jpeg', medalha: 'gold' }]
+            }
+        };
+
+        function openAlbum(key) {
+            const album = albums[key];
+            if(!album) return;
+            document.getElementById('modal-title').innerText = album.title;
+            
+            const fGrid = document.getElementById('sub-grid-fotos');
+            const vGrid = document.getElementById('sub-grid-videos');
+            
+            fGrid.innerHTML = album.fotos.map(img => `<div class="media-card" onclick="viewMedia(this, 'img')"><img src="${album.folder}/${img}" class="w-full h-full object-cover"></div>`).join('');
+            
+            vGrid.innerHTML = album.videos.map(vid => `
+                <div class="media-card" onclick="viewMedia(this, 'video')">
+                    ${vid.medalha ? `<span class="badge-status" style="top:10px; right:10px; padding:4px 15px; font-size:9px; border-radius:8px;">Ouro</span>` : ''}
+                    <video poster="${album.folder}/${vid.capa}" class="w-full h-full object-cover">
+                        <source src="${album.folder}/${vid.arquivo}" type="video/mp4">
+                    </video>
+                    <div class="absolute inset-0 flex items-center justify-center bg-black/20">
+                        <i class="fas fa-play text-white text-3xl"></i>
+                    </div>
+                </div>
+            `).join('');
+            
+            switchSubTab('fotos');
+            
+            document.getElementById('album-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAlbumModal() { 
+            document.getElementById('album-modal').classList.remove('active'); 
+            document.body.style.overflow = 'auto'; 
+        }
+
+        function switchSubTab(type) {
+            const bF = document.getElementById('sub-btn-fotos'), bV = document.getElementById('sub-btn-videos');
+            const gF = document.getElementById('sub-grid-fotos'), gV = document.getElementById('sub-grid-videos');
+            if(type === 'fotos') {
+                gF.classList.remove('hidden'); gV.classList.add('hidden');
+                bF.className = 'pb-4 font-bold uppercase tracking-widest text-red-500 border-b-2 border-red-500';
+                bV.className = 'pb-4 font-bold uppercase tracking-widest text-gray-500';
+            } else {
+                gV.classList.remove('hidden'); gF.classList.add('hidden');
+                bV.className = 'pb-4 font-bold uppercase tracking-widest text-red-500 border-b-2 border-red-500';
+                bF.className = 'pb-4 font-bold uppercase tracking-widest text-gray-500';
+            }
+        }
+
+        function copyPix() {
+            navigator.clipboard.writeText('20147969719');
+            const msg = document.getElementById('pix-msg');
+            msg.classList.remove('hidden');
+            setTimeout(() => { msg.classList.add('hidden'); }, 3000);
+        }
+
+        function switchMainTab(tab) {
+            const treinos = document.getElementById('main-grid-treino'), campeonato = document.getElementById('main-grid-campeonato');
+            const btnT = document.getElementById('btn-treino'), btnC = document.getElementById('btn-campeonato');
+            if(tab === 'treino') {
+                campeonato.classList.remove('active-tab');
+                setTimeout(() => { treinos.classList.add('active-tab'); btnT.classList.add('tab-active'); btnT.classList.remove('text-gray-500'); btnC.classList.remove('tab-active'); btnC.classList.add('text-gray-500'); }, 300);
+            } else {
+                treinos.classList.remove('active-tab');
+                setTimeout(() => { campeonato.classList.add('active-tab'); btnC.classList.add('tab-active'); btnC.classList.remove('text-gray-500'); btnT.classList.remove('tab-active'); btnT.classList.add('text-gray-500'); }, 300);
+            }
+        }
+
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight, elementTop = reveals[i].getBoundingClientRect().top;
+                if (elementTop < windowHeight - 100) reveals[i].classList.add("active");
+            }
+        }
+
+        function updateCountdown() {
+            const data = new Date("2026-07-14T08:00:00").getTime(), agora = new Date().getTime(), dif = data - agora;
+            if (dif > 0) document.getElementById("countdown-days").innerText = Math.floor(dif / (1000 * 60 * 60 * 24));
+        }
+
+        function viewMedia(el, type) {
+            const container = document.getElementById('lightbox-container');
+            const src = type === 'img' ? el.querySelector('img').src : el.querySelector('source').src;
+            
+            if (type === 'video') {
+                container.innerHTML = `
+                    <video controls autoplay playsinline class="max-w-full max-h-[80vh] md:max-w-[420px] rounded-2xl shadow-2xl border border-white/10 bg-black" onclick="event.stopPropagation()">
+                        <source src="${src}" type="video/mp4">
+                    </video>`;
+            } else {
+                container.innerHTML = `
+                    <img src="${src}" class="max-w-full max-h-[80vh] md:max-w-[800px] object-contain rounded-2xl shadow-2xl border border-white/10" onclick="event.stopPropagation()">`;
+            }
+                
+            document.getElementById('lightbox').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox(event) {
+            document.getElementById('lightbox').style.display = 'none';
+            const container = document.getElementById('lightbox-container');
+            container.innerHTML = '';
+            
+            if(!document.getElementById('album-modal').classList.contains('active')) {
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        window.addEventListener("scroll", reveal);
+        setInterval(updateCountdown, 1000);
+        reveal(); updateCountdown();
+    </script>
+</body>
+</html>
